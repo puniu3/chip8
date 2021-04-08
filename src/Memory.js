@@ -1,4 +1,5 @@
-import { MEMORY_SIZE } from "./memoryConstants";
+import { CHAR_HEIGHT } from "./charSet";
+import { CHARSET_ADDRESS, MEMORY_SIZE } from "./memoryConstants";
 
 export class Memory {
 	constructor() {
@@ -13,5 +14,10 @@ export class Memory {
 
 	getMemory(idx) {
 		if (idx < MEMORY_SIZE) return this.memory[idx];
+	}
+
+	sprite(id) {
+		const offset = CHARSET_ADDRESS + id * CHAR_HEIGHT;
+		return this.memory.slice(offset, offset + CHAR_HEIGHT);
 	}
 }

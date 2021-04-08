@@ -1,4 +1,4 @@
-import { BG_COLOR, COLOR, SCALE, DISPLAY_HEIGHT, DISPLAY_WIDTH } from "./displayConstants";
+import { BG_COLOR, COLOR, SCALE, DISPLAY_HEIGHT, DISPLAY_WIDTH, SPRITE_WIDTH } from "./displayConstants";
 
 export class Display {
 	constructor() {
@@ -21,6 +21,13 @@ export class Display {
 		this.frameBuffer.forEach((row, y) =>
 			row.forEach((pic, x) =>
 				pic && this.context.fillRect(x * SCALE, y * SCALE, SCALE, SCALE)));
+	}
+
+	drawSprite(sprite, x = 0, y = 0) {
+		for (let row = 0; row < sprite.length; ++row) {
+			for (let col = 0; col < SPRITE_WIDTH; ++col)
+				this.frameBuffer[y + row][x + col] = sprite[row] & 1 << 7 - col;
+		}
 	}
 }
 
