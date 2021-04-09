@@ -7,230 +7,6 @@
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Chip8": () => (/* binding */ Chip8)
-/* harmony export */ });
-/* harmony import */ var _charSet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9);
-/* harmony import */ var _Display__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);
-/* harmony import */ var _Keyboard__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4);
-/* harmony import */ var _Memory__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(5);
-/* harmony import */ var _memoryConstants__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(6);
-/* harmony import */ var _Registers__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(7);
-
-
-
-
-
-
-
-class Chip8 {
-	constructor() {
-		console.log("Create a new Chip-8");
-		this.display = new _Display__WEBPACK_IMPORTED_MODULE_1__.Display();
-		this.memory = new _Memory__WEBPACK_IMPORTED_MODULE_3__.Memory();
-		this.registers = new _Registers__WEBPACK_IMPORTED_MODULE_5__.Registers();
-		this.keyboard = new _Keyboard__WEBPACK_IMPORTED_MODULE_2__.Keyboard();
-		this.memory.memory.set(_charSet__WEBPACK_IMPORTED_MODULE_0__.CHARSET, _memoryConstants__WEBPACK_IMPORTED_MODULE_4__.CHARSET_ADDRESS);
-	}
-
-	sleep(ms = 500) {
-		return new Promise(resolve => setTimeout(resolve, ms));
-	}
-}
-
-/***/ }),
-/* 2 */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Display": () => (/* binding */ Display)
-/* harmony export */ });
-/* harmony import */ var _displayConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
-
-
-class Display {
-	constructor() {
-		console.log("Create a new Display");
-		this.screen = document.querySelector("canvas");
-
-		this.screen.width = _displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_WIDTH * _displayConstants__WEBPACK_IMPORTED_MODULE_0__.SCALE;
-		this.screen.height = _displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_HEIGHT * _displayConstants__WEBPACK_IMPORTED_MODULE_0__.SCALE;
-		this.context = this.screen.getContext("2d");
-
-		this.frameBuffer = blankBuffer();
-		this.draw();
-	}
-
-	draw() {
-		this.context.fillStyle = _displayConstants__WEBPACK_IMPORTED_MODULE_0__.BG_COLOR;
-		this.context.fillRect(0, 0, screen.width, screen.height);
-
-		this.context.fillStyle = _displayConstants__WEBPACK_IMPORTED_MODULE_0__.COLOR;
-		this.frameBuffer.forEach((row, y) =>
-			row.forEach((pic, x) =>
-				pic && this.context.fillRect(x * _displayConstants__WEBPACK_IMPORTED_MODULE_0__.SCALE, y * _displayConstants__WEBPACK_IMPORTED_MODULE_0__.SCALE, _displayConstants__WEBPACK_IMPORTED_MODULE_0__.SCALE, _displayConstants__WEBPACK_IMPORTED_MODULE_0__.SCALE)));
-	}
-
-	drawSprite(sprite, x = 0, y = 0) {
-		for (let row = 0; row < sprite.length; ++row) {
-			for (let col = 0; col < _displayConstants__WEBPACK_IMPORTED_MODULE_0__.SPRITE_WIDTH; ++col)
-				this.frameBuffer[y + row][x + col] = sprite[row] & 1 << 7 - col;
-		}
-	}
-}
-
-const blankBuffer = () => Array(_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_HEIGHT).fill([]).map(row => Array(_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_WIDTH).fill(0));
-
-/***/ }),
-/* 3 */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "DISPLAY_WIDTH": () => (/* binding */ DISPLAY_WIDTH),
-/* harmony export */   "DISPLAY_HEIGHT": () => (/* binding */ DISPLAY_HEIGHT),
-/* harmony export */   "SCALE": () => (/* binding */ SCALE),
-/* harmony export */   "SPRITE_WIDTH": () => (/* binding */ SPRITE_WIDTH),
-/* harmony export */   "BG_COLOR": () => (/* binding */ BG_COLOR),
-/* harmony export */   "COLOR": () => (/* binding */ COLOR)
-/* harmony export */ });
-const DISPLAY_WIDTH = 64;
-const DISPLAY_HEIGHT = 32;
-const SCALE = 10;
-const SPRITE_WIDTH = 8;
-const BG_COLOR = "#000";
-const COLOR = "#3f6";
-
-/***/ }),
-/* 4 */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Keyboard": () => (/* binding */ Keyboard)
-/* harmony export */ });
-const keyMap = [..."x123qweasdzc4rfv"];
-const NUM_KEYS = 16;
-
-class Keyboard {
-	constructor() {
-		this.keys = new Array(NUM_KEYS).fill(false);
-		window.addEventListener("keydown", e => this.keydown(e));
-		window.addEventListener("keyup", e => this.keyup(e));
-	}
-
-	keydown({ key }) {
-		const idx = keyMap.indexOf(key);
-		if (idx !== -1) this.keys[idx] = true;
-	}
-
-	keyup({ key }) {
-		const idx = keyMap.indexOf(key);
-		if (idx !== -1) this.keys[idx] = false;
-	}
-
-	getkey(key) { return this.keys[key] || false; }
-	anydown() { return this.keys.some(down => down); }
-}
-
-/***/ }),
-/* 5 */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Memory": () => (/* binding */ Memory)
-/* harmony export */ });
-/* harmony import */ var _charSet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9);
-/* harmony import */ var _memoryConstants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6);
-
-
-
-class Memory {
-	constructor() {
-		this.memory = new Uint8Array(_memoryConstants__WEBPACK_IMPORTED_MODULE_1__.MEMORY_SIZE);
-		this.memory.fill(0);
-	}
-
-	setMemory(idx, val) {
-		if (idx < _memoryConstants__WEBPACK_IMPORTED_MODULE_1__.MEMORY_SIZE)
-			this.memory[idx] = val;
-	}
-
-	getMemory(idx) {
-		if (idx < _memoryConstants__WEBPACK_IMPORTED_MODULE_1__.MEMORY_SIZE) return this.memory[idx];
-	}
-
-	sprite(id) {
-		const offset = _memoryConstants__WEBPACK_IMPORTED_MODULE_1__.CHARSET_ADDRESS + id * _charSet__WEBPACK_IMPORTED_MODULE_0__.CHAR_HEIGHT;
-		return this.memory.slice(offset, offset + _charSet__WEBPACK_IMPORTED_MODULE_0__.CHAR_HEIGHT);
-	}
-}
-
-/***/ }),
-/* 6 */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "MEMORY_SIZE": () => (/* binding */ MEMORY_SIZE),
-/* harmony export */   "ENTRY_POINT": () => (/* binding */ ENTRY_POINT),
-/* harmony export */   "CHARSET_ADDRESS": () => (/* binding */ CHARSET_ADDRESS)
-/* harmony export */ });
-const MEMORY_SIZE = 4096;
-const ENTRY_POINT = 0x200;
-const CHARSET_ADDRESS = 0x000;
-
-/***/ }),
-/* 7 */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Registers": () => (/* binding */ Registers)
-/* harmony export */ });
-/* harmony import */ var _memoryConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6);
-/* harmony import */ var _registersConstants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(8);
-
-
-
-class Registers {
-	constructor() {
-		this.reset();
-	}
-
-	reset() {
-		this.V = new Uint8Array(_registersConstants__WEBPACK_IMPORTED_MODULE_1__.NUM_REGISTERS).fill(0);
-		this.I = 0;
-		this.DT = 0;
-		this.ST = 0;
-		this.PC = _memoryConstants__WEBPACK_IMPORTED_MODULE_0__.ENTRY_POINT;
-		this.SP = -1;
-		this.stack = new Uint16Array(_registersConstants__WEBPACK_IMPORTED_MODULE_1__.STACK_DEPTH).fill(0);
-	}
-
-	push(val) { this.stack[++this.SP] = val; }
-	pop() { return this.stack[this.SP--]; }
-}
-
-/***/ }),
-/* 8 */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "NUM_REGISTERS": () => (/* binding */ NUM_REGISTERS),
-/* harmony export */   "STACK_DEPTH": () => (/* binding */ STACK_DEPTH)
-/* harmony export */ });
-const NUM_REGISTERS = 16;
-const STACK_DEPTH = 16;
-
-/***/ }),
-/* 9 */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "CHAR_HEIGHT": () => (/* binding */ CHAR_HEIGHT),
 /* harmony export */   "CHARSET": () => (/* binding */ CHARSET)
 /* harmony export */ });
@@ -318,6 +94,356 @@ const CHARSET = [
 	0x80,
 ];
 
+/***/ }),
+/* 2 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Chip8": () => (/* binding */ Chip8)
+/* harmony export */ });
+/* harmony import */ var _charSet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
+/* harmony import */ var _Display__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
+/* harmony import */ var _Keyboard__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(5);
+/* harmony import */ var _Memory__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(6);
+/* harmony import */ var _memoryConstants__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(7);
+/* harmony import */ var _Registers__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(8);
+/* harmony import */ var _registersConstants__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(9);
+
+
+
+
+
+
+
+
+class Chip8 {
+	constructor(romBuffer) {
+		console.log("Create a new Chip-8");
+		this.display = new _Display__WEBPACK_IMPORTED_MODULE_1__.Display();
+		this.memory = new _Memory__WEBPACK_IMPORTED_MODULE_3__.Memory();
+		this.registers = new _Registers__WEBPACK_IMPORTED_MODULE_5__.Registers();
+		this.keyboard = new _Keyboard__WEBPACK_IMPORTED_MODULE_2__.Keyboard();
+		this.memory.memory.set(_charSet__WEBPACK_IMPORTED_MODULE_0__.CHARSET, _memoryConstants__WEBPACK_IMPORTED_MODULE_4__.CHARSET_ADDRESS);
+		this.loadRom(romBuffer);
+	}
+
+	loadRom(romBuffer) {
+		console.assert(romBuffer.length + _memoryConstants__WEBPACK_IMPORTED_MODULE_4__.ENTRY_POINT <= 0x0fff);
+		this.memory.memory.set(romBuffer, _memoryConstants__WEBPACK_IMPORTED_MODULE_4__.ENTRY_POINT);
+		this.registers.PC = _memoryConstants__WEBPACK_IMPORTED_MODULE_4__.ENTRY_POINT;
+	}
+
+	sleep(ms = _registersConstants__WEBPACK_IMPORTED_MODULE_6__.CLOCK) {
+		return new Promise(resolve => setTimeout(resolve, ms));
+	}
+}
+
+/***/ }),
+/* 3 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Display": () => (/* binding */ Display)
+/* harmony export */ });
+/* harmony import */ var _displayConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4);
+
+
+class Display {
+	constructor() {
+		console.log("Create a new Display");
+		this.screen = document.querySelector("canvas");
+
+		this.screen.width = _displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_WIDTH * _displayConstants__WEBPACK_IMPORTED_MODULE_0__.SCALE;
+		this.screen.height = _displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_HEIGHT * _displayConstants__WEBPACK_IMPORTED_MODULE_0__.SCALE;
+		this.context = this.screen.getContext("2d");
+
+		this.frameBuffer = blankBuffer();
+		this.draw();
+	}
+
+	draw() {
+		this.context.fillStyle = _displayConstants__WEBPACK_IMPORTED_MODULE_0__.BG_COLOR;
+		this.context.fillRect(0, 0, screen.width, screen.height);
+
+		this.context.fillStyle = _displayConstants__WEBPACK_IMPORTED_MODULE_0__.COLOR;
+		this.frameBuffer.forEach((row, y) =>
+			row.forEach((pic, x) =>
+				pic && this.context.fillRect(x * _displayConstants__WEBPACK_IMPORTED_MODULE_0__.SCALE, y * _displayConstants__WEBPACK_IMPORTED_MODULE_0__.SCALE, _displayConstants__WEBPACK_IMPORTED_MODULE_0__.SCALE, _displayConstants__WEBPACK_IMPORTED_MODULE_0__.SCALE)));
+	}
+
+	drawSprite(sprite, x = 0, y = 0) {
+		for (let row = 0; row < sprite.length; ++row) {
+			for (let col = 0; col < _displayConstants__WEBPACK_IMPORTED_MODULE_0__.SPRITE_WIDTH; ++col)
+				this.frameBuffer[y + row][x + col] = sprite[row] & 1 << 7 - col;
+		}
+	}
+}
+
+const blankBuffer = () => Array(_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_HEIGHT).fill([]).map(row => Array(_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_WIDTH).fill(0));
+
+/***/ }),
+/* 4 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "DISPLAY_WIDTH": () => (/* binding */ DISPLAY_WIDTH),
+/* harmony export */   "DISPLAY_HEIGHT": () => (/* binding */ DISPLAY_HEIGHT),
+/* harmony export */   "SCALE": () => (/* binding */ SCALE),
+/* harmony export */   "SPRITE_WIDTH": () => (/* binding */ SPRITE_WIDTH),
+/* harmony export */   "BG_COLOR": () => (/* binding */ BG_COLOR),
+/* harmony export */   "COLOR": () => (/* binding */ COLOR)
+/* harmony export */ });
+const DISPLAY_WIDTH = 64;
+const DISPLAY_HEIGHT = 32;
+const SCALE = 10;
+const SPRITE_WIDTH = 8;
+const BG_COLOR = "#000";
+const COLOR = "#3f6";
+
+/***/ }),
+/* 5 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Keyboard": () => (/* binding */ Keyboard)
+/* harmony export */ });
+const keyMap = [..."x123qweasdzc4rfv"];
+const NUM_KEYS = 16;
+
+class Keyboard {
+	constructor() {
+		this.keys = new Array(NUM_KEYS).fill(false);
+		window.addEventListener("keydown", e => this.keydown(e));
+		window.addEventListener("keyup", e => this.keyup(e));
+	}
+
+	keydown({ key }) {
+		const idx = keyMap.indexOf(key);
+		if (idx !== -1) this.keys[idx] = true;
+	}
+
+	keyup({ key }) {
+		const idx = keyMap.indexOf(key);
+		if (idx !== -1) this.keys[idx] = false;
+	}
+
+	getkey(key) { return this.keys[key] || false; }
+	anydown() { return this.keys.some(down => down); }
+}
+
+/***/ }),
+/* 6 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Memory": () => (/* binding */ Memory)
+/* harmony export */ });
+/* harmony import */ var _charSet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
+/* harmony import */ var _memoryConstants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(7);
+
+
+
+class Memory {
+	constructor() {
+		this.memory = new Uint8Array(_memoryConstants__WEBPACK_IMPORTED_MODULE_1__.MEMORY_SIZE);
+		this.memory.fill(0);
+	}
+
+	setMemory(idx, val) {
+		if (idx < _memoryConstants__WEBPACK_IMPORTED_MODULE_1__.MEMORY_SIZE)
+			this.memory[idx] = val;
+	}
+
+	getMemory(idx) {
+		if (idx < _memoryConstants__WEBPACK_IMPORTED_MODULE_1__.MEMORY_SIZE) return this.memory[idx];
+	}
+
+	getOpcode(idx) {
+		const hb = this.getMemory(idx);
+		const lb = this.getMemory(idx + 1);
+		return (hb << 8) | lb;
+	}
+
+	sprite(id) {
+		const offset = _memoryConstants__WEBPACK_IMPORTED_MODULE_1__.CHARSET_ADDRESS + id * _charSet__WEBPACK_IMPORTED_MODULE_0__.CHAR_HEIGHT;
+		return this.memory.slice(offset, offset + _charSet__WEBPACK_IMPORTED_MODULE_0__.CHAR_HEIGHT);
+	}
+}
+
+/***/ }),
+/* 7 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "MEMORY_SIZE": () => (/* binding */ MEMORY_SIZE),
+/* harmony export */   "ENTRY_POINT": () => (/* binding */ ENTRY_POINT),
+/* harmony export */   "CHARSET_ADDRESS": () => (/* binding */ CHARSET_ADDRESS)
+/* harmony export */ });
+const MEMORY_SIZE = 4096;
+const ENTRY_POINT = 0x200;
+const CHARSET_ADDRESS = 0x000;
+
+/***/ }),
+/* 8 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Registers": () => (/* binding */ Registers)
+/* harmony export */ });
+/* harmony import */ var _memoryConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7);
+/* harmony import */ var _registersConstants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(9);
+
+
+
+class Registers {
+	constructor() {
+		this.reset();
+	}
+
+	reset() {
+		this.V = new Uint8Array(_registersConstants__WEBPACK_IMPORTED_MODULE_1__.NUM_REGISTERS).fill(0);
+		this.I = 0;
+		this.DT = 0;
+		this.ST = 0;
+		this.PC = _memoryConstants__WEBPACK_IMPORTED_MODULE_0__.ENTRY_POINT;
+		this.SP = -1;
+		this.stack = new Uint16Array(_registersConstants__WEBPACK_IMPORTED_MODULE_1__.STACK_DEPTH).fill(0);
+	}
+
+	push(val) { this.stack[++this.SP] = val; }
+	pop() { return this.stack[this.SP--]; }
+}
+
+/***/ }),
+/* 9 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "NUM_REGISTERS": () => (/* binding */ NUM_REGISTERS),
+/* harmony export */   "STACK_DEPTH": () => (/* binding */ STACK_DEPTH),
+/* harmony export */   "CLOCK": () => (/* binding */ CLOCK)
+/* harmony export */ });
+const NUM_REGISTERS = 16;
+const STACK_DEPTH = 16;
+const CLOCK = 1000 / 60;
+
+/***/ }),
+/* 10 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "disassemble": () => (/* binding */ disassemble)
+/* harmony export */ });
+function Instruction(key, id, name, pattern, args = []) {
+	this.key = key;
+	this.id = id;
+	this.name = name;
+	this.pattern = pattern;
+	this.mask = args.reduce((pat, arg) => pat ^ arg, 0xffff);
+	this.args = args.map(mask => ({ mask, shift: trailZeros(mask) }));
+
+	function trailZeros(mask) {
+		if ((mask & 0x0fff) === 0) return 12;
+		if ((mask & 0x00ff) === 0) return 8;
+		if ((mask & 0x000f) === 0) return 4;
+		return 0;
+	}
+}
+
+const INSTRUCTIONS = [
+	new Instruction(2, "CLS", "CLS", 0x00e0),
+	new Instruction(3, "RET", "RET", 0x00ee),
+	new Instruction(4, "JP_ADDR", "JP", 0x1000, [0x0fff]),
+	new Instruction(5, "CALL_ADDR", "CALL", 0x2000, [0x0fff]),
+	new Instruction(6, "SE_VX_NN", "SE", 0x3000, [0x0f00, 0x00ff]),
+	new Instruction(7, "SNE_VX_NN", "SNE", 0x4000, [0x0f00, 0x00ff]),
+	new Instruction(8, "SE_VX_VY", "SE", 0x5000, [0x0f00, 0x00f0]),
+	new Instruction(9, "LD_VX_KK", "LD", 0x6000, [0x0f00, 0x00ff]),
+	new Instruction(10, "ADD_VX_KK", "ADD", 0x7000, [0x0f00, 0x00ff]),
+	new Instruction(11, "LD_VX_VY", "LD", 0x8000, [0x0f00, 0x00f0]),
+	new Instruction(12, "OR_VX_VY", "OR", 0x8001, [0x0f00, 0x00f0]),
+	new Instruction(13, "AND_VX_VY", "AND", 0x8002, [0x0f00, 0x00f0]),
+	new Instruction(14, "XOR_VX_VY", "XOR", 0x8003, [0x0f00, 0x00f0]),
+	new Instruction(15, "ADD_VX_VY", "ADD", 0x8004, [0x0f00, 0x00f0]),
+	new Instruction(16, "SUB_VX_VY", "SUB", 0x8005, [0x0f00, 0x00f0]),
+	new Instruction(17, "SHR_VX_VY", "SHR", 0x8006, [0x0f00, 0x00f0]),
+	new Instruction(18, "SUBN_VX_VY", "SUBN", 0x8007, [0x0f00, 0x00f0]),
+	new Instruction(19, "SHL_VX_VY", "SHL", 0x800e, [0x0f00, 0x00f0]),
+	new Instruction(20, "SNE_VX_VY", "SNE", 0x9000, [0x0f00, 0x00f0]),
+	new Instruction(21, "LD_ADDR", "LD", 0xa000, [0x0fff]),
+	new Instruction(22, "JP_ADDR", "JP", 0xb000, [0x0fff]),
+	new Instruction(23, "RND_VX_KK", "RND", 0xc000, [0x0f00, 0x00ff]),
+	new Instruction(24, "DRW_VX_VY_N", "DRW", 0xd000, [0x0f00, 0x00f0, 0x000f]),
+	new Instruction(25, "SKP_VX", "SKP", 0xe09e, [0x0f00]),
+	new Instruction(26, "SKNP_VX", "SKNP", 0xe0a1, [0x0f00]),
+	new Instruction(27, "LD_VX_DT", "LD", 0xf007, [0x0f00]),
+	new Instruction(28, "LD_VX_K", "LD", 0xf00a, [0x0f00]),
+	new Instruction(29, "LD_DT_VX", "LD", 0xf015, [0x0f00]),
+	new Instruction(30, "LD_ST_VX", "LD", 0xf018, [0x0f00]),
+	new Instruction(31, "ADD_I_VX", "ADD", 0xf01e, [0x0f00]),
+	new Instruction(32, "LD_F_VX", "LD", 0xf029, [0x0f00]),
+	new Instruction(33, "LD_B_VX", "LD", 0xf033, [0x0f00]),
+	new Instruction(34, "LD_I_VX", "LD", 0xf055, [0x0f00]),
+	new Instruction(35, "LD_VX_I", "LD", 0xf065, [0x0f00]),
+
+];
+
+function disassemble(opcode) {
+	const inst = INSTRUCTIONS.find(
+		i => (opcode & i.mask) === i.pattern
+	);
+	const args = inst.args
+		.map(a => (a.mask & opcode) >> a.shift);
+}
+
+/***/ }),
+/* 11 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "soundcard": () => (/* binding */ soundcard)
+/* harmony export */ });
+const soundcard = (() => {
+	const VOLUME = 0.3;
+	const atx = new (window.AudioContext || window.webkitAudioContext)();
+	const gain = atx.createGain();
+	const osc = atx.createOscillator();
+	osc.connect(gain).connect(atx.destination);
+
+	gain.gain.setValueAtTime(VOLUME, atx.currentTime);
+	osc.type = "triangle";
+	osc.frequency.value = 392;
+
+	let playing = false;
+
+	return {
+		start: () => {
+			if (playing) return;
+			playing = true;
+			osc.start(atx.currentTime)
+		},
+		stop: () => {
+			if (!playing) return;
+			playing = false;
+			gain.gain.setValueAtTime(VOLUME, atx.currentTime);
+			gain.gain.exponentialRampToValueAtTime(0.0000001, atx.currentTime + .02);
+			osc.stop(atx.currentTime + .02);
+		},
+	}
+
+})();
+
+
 /***/ })
 /******/ 	]);
 /************************************************************************/
@@ -379,23 +505,40 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _charSet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9);
-/* harmony import */ var _Chip8__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
-/* harmony import */ var _Registers__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(7);
+/* harmony import */ var _charSet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
+/* harmony import */ var _Chip8__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);
+/* harmony import */ var _disassemble__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(10);
+/* harmony import */ var _Registers__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(8);
+/* harmony import */ var _registersConstants__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(9);
+/* harmony import */ var _SoundCard__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(11);
 
 
 
 
-const chip8 = new _Chip8__WEBPACK_IMPORTED_MODULE_1__.Chip8();
+
+
+
 
 (async () => {
-	const zero = chip8.memory.sprite(0);
-	const four = chip8.memory.sprite(4);
-	const a = chip8.memory.sprite(10);
-	chip8.display.drawSprite(zero, 0, 10);
-	chip8.display.drawSprite(four, 8, 10);
-	chip8.display.drawSprite(a, 16, 10);
-	chip8.display.draw();
+	const rom = await fetch("../roms/test_opcode.ch8");
+	const arrayBuffer = await rom.arrayBuffer();
+	const romBuffer = new Uint8Array(arrayBuffer);
+	const chip8 = new _Chip8__WEBPACK_IMPORTED_MODULE_1__.Chip8(romBuffer);
+
+	console.log(chip8.memory.getOpcode(0x200).toString(16));
+	console.log(chip8.memory.getOpcode(0x202).toString(16));
+	console.log(chip8.memory.getOpcode(0x204).toString(16));
+	// while (true) {
+	// 	if (chip8.registers.DT)
+	// 		--chip8.registers.DT;
+	// 	if (chip8.registers.ST) {
+	// 		--chip8.registers.ST;
+	// 		soundcard.start();
+	// 	} else {
+	// 		soundcard.stop();
+	// 	}
+	// 	await chip8.sleep(CLOCK);
+	// }
 })();
 })();
 

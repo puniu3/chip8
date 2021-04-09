@@ -16,6 +16,12 @@ export class Memory {
 		if (idx < MEMORY_SIZE) return this.memory[idx];
 	}
 
+	getOpcode(idx) {
+		const hb = this.getMemory(idx);
+		const lb = this.getMemory(idx + 1);
+		return (hb << 8) | lb;
+	}
+
 	sprite(id) {
 		const offset = CHARSET_ADDRESS + id * CHAR_HEIGHT;
 		return this.memory.slice(offset, offset + CHAR_HEIGHT);

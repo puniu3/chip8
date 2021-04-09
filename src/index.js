@@ -1,15 +1,29 @@
 import { CHAR_HEIGHT } from "./charSet";
 import { Chip8 } from "./Chip8";
+import { disassemble } from "./disassemble";
 import { Registers } from "./Registers";
+import { CLOCK } from "./registersConstants";
+import { soundcard } from "./SoundCard";
 
-const chip8 = new Chip8();
 
 (async () => {
-	const zero = chip8.memory.sprite(0);
-	const four = chip8.memory.sprite(4);
-	const a = chip8.memory.sprite(10);
-	chip8.display.drawSprite(zero, 0, 10);
-	chip8.display.drawSprite(four, 8, 10);
-	chip8.display.drawSprite(a, 16, 10);
-	chip8.display.draw();
+	const rom = await fetch("../roms/test_opcode.ch8");
+	const arrayBuffer = await rom.arrayBuffer();
+	const romBuffer = new Uint8Array(arrayBuffer);
+	const chip8 = new Chip8(romBuffer);
+
+	console.log(chip8.memory.getOpcode(0x200).toString(16));
+	console.log(chip8.memory.getOpcode(0x202).toString(16));
+	console.log(chip8.memory.getOpcode(0x204).toString(16));
+	// while (true) {
+	// 	if (chip8.registers.DT)
+	// 		--chip8.registers.DT;
+	// 	if (chip8.registers.ST) {
+	// 		--chip8.registers.ST;
+	// 		soundcard.start();
+	// 	} else {
+	// 		soundcard.stop();
+	// 	}
+	// 	await chip8.sleep(CLOCK);
+	// }
 })();
