@@ -17,6 +17,7 @@ export class Memory {
 	}
 
 	getOpcode(idx) {
+		console.assert((idx & 1) === 0, "opcode address must be even number");
 		const hb = this.getMemory(idx);
 		const lb = this.getMemory(idx + 1);
 		return (hb << 8) | lb;

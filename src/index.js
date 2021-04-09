@@ -1,4 +1,4 @@
-import { CHAR_HEIGHT } from "./charSet";
+import { CHARSET, CHAR_HEIGHT } from "./charSet";
 import { Chip8 } from "./Chip8";
 import { disassemble } from "./disassemble";
 import { Registers } from "./Registers";
@@ -12,9 +12,12 @@ import { soundcard } from "./SoundCard";
 	const romBuffer = new Uint8Array(arrayBuffer);
 	const chip8 = new Chip8(romBuffer);
 
-	console.log(chip8.memory.getOpcode(0x200).toString(16));
-	console.log(chip8.memory.getOpcode(0x202).toString(16));
-	console.log(chip8.memory.getOpcode(0x204).toString(16));
+	chip8.execute(0x69f5);
+	chip8.execute(0xf929);
+	chip8.execute(0xd005);
+	chip8.execute(0xff55);
+	chip8.display.draw();
+
 	// while (true) {
 	// 	if (chip8.registers.DT)
 	// 		--chip8.registers.DT;

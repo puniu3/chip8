@@ -19,5 +19,6 @@ export class Keyboard {
 	}
 
 	getkey(key) { return this.keys[key] || false; }
+	getPressedKey() { return this.keys.indexOf(true); }
 	anydown() { return this.keys.some(down => down); }
 }

@@ -19,8 +19,8 @@ const INSTRUCTIONS = [
 	new Instruction(3, "RET", "RET", 0x00ee),
 	new Instruction(4, "JP_ADDR", "JP", 0x1000, [0x0fff]),
 	new Instruction(5, "CALL_ADDR", "CALL", 0x2000, [0x0fff]),
-	new Instruction(6, "SE_VX_NN", "SE", 0x3000, [0x0f00, 0x00ff]),
-	new Instruction(7, "SNE_VX_NN", "SNE", 0x4000, [0x0f00, 0x00ff]),
+	new Instruction(6, "SE_VX_KK", "SE", 0x3000, [0x0f00, 0x00ff]),
+	new Instruction(7, "SNE_VX_KK", "SNE", 0x4000, [0x0f00, 0x00ff]),
 	new Instruction(8, "SE_VX_VY", "SE", 0x5000, [0x0f00, 0x00f0]),
 	new Instruction(9, "LD_VX_KK", "LD", 0x6000, [0x0f00, 0x00ff]),
 	new Instruction(10, "ADD_VX_KK", "ADD", 0x7000, [0x0f00, 0x00ff]),
@@ -35,7 +35,7 @@ const INSTRUCTIONS = [
 	new Instruction(19, "SHL_VX_VY", "SHL", 0x800e, [0x0f00, 0x00f0]),
 	new Instruction(20, "SNE_VX_VY", "SNE", 0x9000, [0x0f00, 0x00f0]),
 	new Instruction(21, "LD_ADDR", "LD", 0xa000, [0x0fff]),
-	new Instruction(22, "JP_ADDR", "JP", 0xb000, [0x0fff]),
+	new Instruction(22, "JP_V0_ADDR", "JP", 0xb000, [0x0fff]),
 	new Instruction(23, "RND_VX_KK", "RND", 0xc000, [0x0f00, 0x00ff]),
 	new Instruction(24, "DRW_VX_VY_N", "DRW", 0xd000, [0x0f00, 0x00f0, 0x000f]),
 	new Instruction(25, "SKP_VX", "SKP", 0xe09e, [0x0f00]),
@@ -56,6 +56,8 @@ export function disassemble(opcode) {
 	const inst = INSTRUCTIONS.find(
 		i => (opcode & i.mask) === i.pattern
 	);
+	console.assert(inst !== undefined, "invalid opcode");
 	const args = inst.args
 		.map(a => (a.mask & opcode) >> a.shift);
+	return { id: inst.id, args };
 }

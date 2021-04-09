@@ -8,10 +8,12 @@ export class Display {
 		this.screen.width = DISPLAY_WIDTH * SCALE;
 		this.screen.height = DISPLAY_HEIGHT * SCALE;
 		this.context = this.screen.getContext("2d");
+		this.clear();
 
-		this.frameBuffer = blankBuffer();
 		this.draw();
 	}
+
+	clear() { this.frameBuffer = blankBuffer(); }
 
 	draw() {
 		this.context.fillStyle = BG_COLOR;
@@ -24,10 +26,17 @@ export class Display {
 	}
 
 	drawSprite(sprite, x = 0, y = 0) {
+		let collision = false;
 		for (let row = 0; row < sprite.length; ++row) {
-			for (let col = 0; col < SPRITE_WIDTH; ++col)
-				this.frameBuffer[y + row][x + col] = sprite[row] & 1 << 7 - col;
+			for (let col = 0; col < SPRITE_WIDTH; ++col) {
+				const xx = (x + col) % DISPLAY_WIDTH;
+				const yy = (y + row) % DISPLAY_HEIGHT;
+				const pix = sprite[row] & 1 << 7 - col;
+				if (this.frameBuffer[yy][xx] & pix) collision = true;
+				this.frameBuffer[yy][xx] ^= pix;
+			}
 		}
+		return collision;
 	}
 }
 
