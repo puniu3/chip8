@@ -2,7 +2,7 @@ import { CHARSET, CHAR_HEIGHT } from "./charSet";
 import { Chip8 } from "./Chip8";
 import { disassemble } from "./disassemble";
 import { Registers } from "./Registers";
-import { CLOCK } from "./registersConstants";
+import { CLOCKS_PER_TIME_UNIT, TIME_UNIT } from "./registersConstants";
 import { makeSoundcard } from "./SoundCard";
 
 document.addEventListener("mousedown", boot);
@@ -20,10 +20,11 @@ async function run() {
 	const soundcard = makeSoundcard();
 
 	while (true) {
-		const op = chip8.memory.getOpcode(chip8.registers.PC);
-		chip8.execute(op);
-		chip8.display.draw();
-
+		for (let i = 0; i < CLOCKS_PER_TIME_UNIT; ++i) {
+			const op = chip8.memory.getOpcode(chip8.registers.PC);
+			chip8.execute(op);
+			chip8.display.draw();
+		}
 		if (chip8.registers.DT > 0) {
 			--chip8.registers.DT;
 		}
@@ -34,7 +35,6 @@ async function run() {
 		} else {
 			soundcard.stop();
 		}
-
-		await chip8.sleep(CLOCK / 5);
+		await chip8.sleep(TIME_UNIT);
 	}
 }

@@ -561,11 +561,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "NUM_REGISTERS": () => (/* binding */ NUM_REGISTERS),
 /* harmony export */   "STACK_DEPTH": () => (/* binding */ STACK_DEPTH),
-/* harmony export */   "CLOCK": () => (/* binding */ CLOCK)
+/* harmony export */   "TIME_UNIT": () => (/* binding */ TIME_UNIT),
+/* harmony export */   "CLOCKS_PER_TIME_UNIT": () => (/* binding */ CLOCKS_PER_TIME_UNIT)
 /* harmony export */ });
 const NUM_REGISTERS = 16;
 const STACK_DEPTH = 16;
-const CLOCK = 1000 / 60;
+const TIME_UNIT = 1000 / 60;
+const CLOCKS_PER_TIME_UNIT = 8;
 
 /***/ }),
 /* 11 */
@@ -694,10 +696,11 @@ async function run() {
 	const soundcard = (0,_SoundCard__WEBPACK_IMPORTED_MODULE_5__.makeSoundcard)();
 
 	while (true) {
-		const op = chip8.memory.getOpcode(chip8.registers.PC);
-		chip8.execute(op);
-		chip8.display.draw();
-
+		for (let i = 0; i < _registersConstants__WEBPACK_IMPORTED_MODULE_4__.CLOCKS_PER_TIME_UNIT; ++i) {
+			const op = chip8.memory.getOpcode(chip8.registers.PC);
+			chip8.execute(op);
+			chip8.display.draw();
+		}
 		if (chip8.registers.DT > 0) {
 			--chip8.registers.DT;
 		}
@@ -708,8 +711,7 @@ async function run() {
 		} else {
 			soundcard.stop();
 		}
-
-		await chip8.sleep(_registersConstants__WEBPACK_IMPORTED_MODULE_4__.CLOCK / 5);
+		await chip8.sleep(_registersConstants__WEBPACK_IMPORTED_MODULE_4__.TIME_UNIT);
 	}
 }
 })();
