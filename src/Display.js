@@ -2,7 +2,6 @@ import { BG_COLOR, COLOR, SCALE, DISPLAY_HEIGHT, DISPLAY_WIDTH, SPRITE_WIDTH } f
 
 export class Display {
 	constructor() {
-		console.log("Create a new Display");
 		this.screen = document.querySelector("canvas");
 
 		this.screen.width = DISPLAY_WIDTH * SCALE;
@@ -16,13 +15,11 @@ export class Display {
 	clear() { this.frameBuffer = blankBuffer(); }
 
 	draw() {
-		this.context.fillStyle = BG_COLOR;
-		this.context.fillRect(0, 0, screen.width, screen.height);
-
-		this.context.fillStyle = COLOR;
 		this.frameBuffer.forEach((row, y) =>
-			row.forEach((pic, x) =>
-				pic && this.context.fillRect(x * SCALE, y * SCALE, SCALE, SCALE)));
+			row.forEach((pic, x) => {
+				this.context.fillStyle = pic ? COLOR : BG_COLOR;
+				this.context.fillRect(x * SCALE, y * SCALE, SCALE, SCALE);
+			}));
 	}
 
 	drawSprite(sprite, x = 0, y = 0) {

@@ -18,7 +18,7 @@ export class Registers {
 
 	push(val) { this.stack[++this.SP] = val; }
 	pop() {
-		console.assert(this.SP > 0, "stack underflow.");
+		console.assert(this.SP >= 0, "stack underflow.");
 		return this.stack[this.SP--];
 	}
 }

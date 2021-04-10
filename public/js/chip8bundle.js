@@ -121,7 +121,6 @@ __webpack_require__.r(__webpack_exports__);
 
 class Chip8 {
 	constructor(romBuffer) {
-		console.log("Create a new Chip-8");
 		this.display = new _Display__WEBPACK_IMPORTED_MODULE_2__.Display();
 		this.memory = new _Memory__WEBPACK_IMPORTED_MODULE_4__.Memory();
 		this.registers = new _Registers__WEBPACK_IMPORTED_MODULE_6__.Registers();
@@ -146,8 +145,8 @@ class Chip8 {
 
 	async execute(opcode) {
 		const { id, args } = (0,_disassemble__WEBPACK_IMPORTED_MODULE_1__.disassemble)(opcode);
-		this.registers.PC++;
-		console.log(id, ...args.map(n => n.toString(16)));
+		this.registers.PC += 2;
+		// console.log(id, ...args.map(n => n.toString(16)));
 
 		const V = this.registers.V;
 
@@ -167,15 +166,15 @@ class Chip8 {
 				break;
 			case "SE_VX_KK":
 				if (V[args[0]] === args[1])
-					this.registers.PC++;
+					this.registers.PC += 2;
 				break;
 			case "SNE_VX_KK":
 				if (V[args[0]] !== args[1])
-					this.registers.PC++;
+					this.registers.PC += 2;
 				break;
 			case "SE_VX_VY":
 				if (V[args[0]] === V[args[1]])
-					this.registers.PC++;
+					this.registers.PC += 2;
 				break;
 			case "LD_VX_KK":
 				V[args[0]] = args[1];
@@ -222,7 +221,7 @@ class Chip8 {
 				break;
 			case "SNE_VX_VY":
 				if (V[args[0]] !== V[args[1]])
-					this.registers.PC++;
+					this.registers.PC += 2;
 				break;
 			case "LD_ADDR":
 				this.registers.I = args[0];
@@ -242,12 +241,12 @@ class Chip8 {
 				V[0xf] = collision ? 1 : 0;
 				break;
 			case "SKP_VX":
-				if (this.keyboard.getkey[V[args[0]]])
-					this.registers.SP++;
+				if (this.keyboard.getkey(V[args[0]]))
+					this.registers.PC += 2;
 				break;
 			case "SKNP_VX":
-				if (!this.keyboard.getkey[V[args[0]]])
-					this.registers.SP++;
+				if (!this.keyboard.getkey(V[args[0]]))
+					this.registers.PC += 2;
 				break;
 			case "LD_VX_DT":
 				V[args[0]] = this.registers.DT;
@@ -349,14 +348,13 @@ const INSTRUCTIONS = [
 	new Instruction(33, "LD_B_VX", "LD", 0xf033, [0x0f00]),
 	new Instruction(34, "LD_I_VX", "LD", 0xf055, [0x0f00]),
 	new Instruction(35, "LD_VX_I", "LD", 0xf065, [0x0f00]),
-
 ];
 
 function disassemble(opcode) {
 	const inst = INSTRUCTIONS.find(
 		i => (opcode & i.mask) === i.pattern
 	);
-	console.assert(inst !== undefined, "invalid opcode");
+	console.assert(inst !== undefined, `invalid opcode ${opcode.toString(16)}`);
 	const args = inst.args
 		.map(a => (a.mask & opcode) >> a.shift);
 	return { id: inst.id, args };
@@ -375,7 +373,6 @@ __webpack_require__.r(__webpack_exports__);
 
 class Display {
 	constructor() {
-		console.log("Create a new Display");
 		this.screen = document.querySelector("canvas");
 
 		this.screen.width = _displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_WIDTH * _displayConstants__WEBPACK_IMPORTED_MODULE_0__.SCALE;
@@ -389,13 +386,11 @@ class Display {
 	clear() { this.frameBuffer = blankBuffer(); }
 
 	draw() {
-		this.context.fillStyle = _displayConstants__WEBPACK_IMPORTED_MODULE_0__.BG_COLOR;
-		this.context.fillRect(0, 0, screen.width, screen.height);
-
-		this.context.fillStyle = _displayConstants__WEBPACK_IMPORTED_MODULE_0__.COLOR;
 		this.frameBuffer.forEach((row, y) =>
-			row.forEach((pic, x) =>
-				pic && this.context.fillRect(x * _displayConstants__WEBPACK_IMPORTED_MODULE_0__.SCALE, y * _displayConstants__WEBPACK_IMPORTED_MODULE_0__.SCALE, _displayConstants__WEBPACK_IMPORTED_MODULE_0__.SCALE, _displayConstants__WEBPACK_IMPORTED_MODULE_0__.SCALE)));
+			row.forEach((pic, x) => {
+				this.context.fillStyle = pic ? _displayConstants__WEBPACK_IMPORTED_MODULE_0__.COLOR : _displayConstants__WEBPACK_IMPORTED_MODULE_0__.BG_COLOR;
+				this.context.fillRect(x * _displayConstants__WEBPACK_IMPORTED_MODULE_0__.SCALE, y * _displayConstants__WEBPACK_IMPORTED_MODULE_0__.SCALE, _displayConstants__WEBPACK_IMPORTED_MODULE_0__.SCALE, _displayConstants__WEBPACK_IMPORTED_MODULE_0__.SCALE);
+			}));
 	}
 
 	drawSprite(sprite, x = 0, y = 0) {
@@ -553,7 +548,7 @@ class Registers {
 
 	push(val) { this.stack[++this.SP] = val; }
 	pop() {
-		console.assert(this.SP > 0, "stack underflow.");
+		console.assert(this.SP >= 0, "stack underflow.");
 		return this.stack[this.SP--];
 	}
 }
@@ -578,37 +573,36 @@ const CLOCK = 1000 / 60;
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "soundcard": () => (/* binding */ soundcard)
+/* harmony export */   "makeSoundcard": () => (/* binding */ makeSoundcard)
 /* harmony export */ });
-const soundcard = (() => {
+const makeSoundcard = () => {
 	const VOLUME = 0.3;
 	const atx = new (window.AudioContext || window.webkitAudioContext)();
 	const gain = atx.createGain();
 	const osc = atx.createOscillator();
 	osc.connect(gain).connect(atx.destination);
 
-	gain.gain.setValueAtTime(VOLUME, atx.currentTime);
+	gain.gain.setValueAtTime(0.00001, atx.currentTime);
 	osc.type = "triangle";
 	osc.frequency.value = 392;
-
+	osc.start(atx.currentTime);
 	let playing = false;
 
 	return {
 		start: () => {
 			if (playing) return;
 			playing = true;
-			osc.start(atx.currentTime)
+			gain.gain.setValueAtTime(VOLUME, atx.currentTime);
 		},
 		stop: () => {
 			if (!playing) return;
 			playing = false;
 			gain.gain.setValueAtTime(VOLUME, atx.currentTime);
 			gain.gain.exponentialRampToValueAtTime(0.0000001, atx.currentTime + .02);
-			osc.stop(atx.currentTime + .02);
 		},
 	}
 
-})();
+};
 
 
 /***/ })
@@ -685,31 +679,39 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+document.addEventListener("mousedown", boot);
 
-(async () => {
-	const rom = await fetch("../roms/test_opcode.ch8");
+function boot() {
+	run();
+	document.removeEventListener("mousedown", boot);
+}
+
+async function run() {
+	const rom = await fetch("/roms/PONG2");
 	const arrayBuffer = await rom.arrayBuffer();
 	const romBuffer = new Uint8Array(arrayBuffer);
 	const chip8 = new _Chip8__WEBPACK_IMPORTED_MODULE_1__.Chip8(romBuffer);
+	const soundcard = (0,_SoundCard__WEBPACK_IMPORTED_MODULE_5__.makeSoundcard)();
 
-	chip8.execute(0x69f5);
-	chip8.execute(0xf929);
-	chip8.execute(0xd005);
-	chip8.execute(0xff55);
-	chip8.display.draw();
+	while (true) {
+		const op = chip8.memory.getOpcode(chip8.registers.PC);
+		chip8.execute(op);
+		chip8.display.draw();
 
-	// while (true) {
-	// 	if (chip8.registers.DT)
-	// 		--chip8.registers.DT;
-	// 	if (chip8.registers.ST) {
-	// 		--chip8.registers.ST;
-	// 		soundcard.start();
-	// 	} else {
-	// 		soundcard.stop();
-	// 	}
-	// 	await chip8.sleep(CLOCK);
-	// }
-})();
+		if (chip8.registers.DT > 0) {
+			--chip8.registers.DT;
+		}
+
+		if (chip8.registers.ST > 0) {
+			--chip8.registers.ST;
+			soundcard.start();
+		} else {
+			soundcard.stop();
+		}
+
+		await chip8.sleep(_registersConstants__WEBPACK_IMPORTED_MODULE_4__.CLOCK / 5);
+	}
+}
 })();
 
 /******/ })()

@@ -9,7 +9,6 @@ import { CLOCK } from "./registersConstants";
 
 export class Chip8 {
 	constructor(romBuffer) {
-		console.log("Create a new Chip-8");
 		this.display = new Display();
 		this.memory = new Memory();
 		this.registers = new Registers();
@@ -34,8 +33,8 @@ export class Chip8 {
 
 	async execute(opcode) {
 		const { id, args } = disassemble(opcode);
-		this.registers.PC++;
-		console.log(id, ...args.map(n => n.toString(16)));
+		this.registers.PC += 2;
+		// console.log(id, ...args.map(n => n.toString(16)));
 
 		const V = this.registers.V;
 
@@ -55,15 +54,15 @@ export class Chip8 {
 				break;
 			case "SE_VX_KK":
 				if (V[args[0]] === args[1])
-					this.registers.PC++;
+					this.registers.PC += 2;
 				break;
 			case "SNE_VX_KK":
 				if (V[args[0]] !== args[1])
-					this.registers.PC++;
+					this.registers.PC += 2;
 				break;
 			case "SE_VX_VY":
 				if (V[args[0]] === V[args[1]])
-					this.registers.PC++;
+					this.registers.PC += 2;
 				break;
 			case "LD_VX_KK":
 				V[args[0]] = args[1];
@@ -110,7 +109,7 @@ export class Chip8 {
 				break;
 			case "SNE_VX_VY":
 				if (V[args[0]] !== V[args[1]])
-					this.registers.PC++;
+					this.registers.PC += 2;
 				break;
 			case "LD_ADDR":
 				this.registers.I = args[0];
@@ -130,12 +129,12 @@ export class Chip8 {
 				V[0xf] = collision ? 1 : 0;
 				break;
 			case "SKP_VX":
-				if (this.keyboard.getkey[V[args[0]]])
-					this.registers.SP++;
+				if (this.keyboard.getkey(V[args[0]]))
+					this.registers.PC += 2;
 				break;
 			case "SKNP_VX":
-				if (!this.keyboard.getkey[V[args[0]]])
-					this.registers.SP++;
+				if (!this.keyboard.getkey(V[args[0]]))
+					this.registers.PC += 2;
 				break;
 			case "LD_VX_DT":
 				V[args[0]] = this.registers.DT;

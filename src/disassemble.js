@@ -49,14 +49,13 @@ const INSTRUCTIONS = [
 	new Instruction(33, "LD_B_VX", "LD", 0xf033, [0x0f00]),
 	new Instruction(34, "LD_I_VX", "LD", 0xf055, [0x0f00]),
 	new Instruction(35, "LD_VX_I", "LD", 0xf065, [0x0f00]),
-
 ];
 
 export function disassemble(opcode) {
 	const inst = INSTRUCTIONS.find(
 		i => (opcode & i.mask) === i.pattern
 	);
-	console.assert(inst !== undefined, "invalid opcode");
+	console.assert(inst !== undefined, `invalid opcode ${opcode.toString(16)}`);
 	const args = inst.args
 		.map(a => (a.mask & opcode) >> a.shift);
 	return { id: inst.id, args };
