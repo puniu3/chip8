@@ -681,15 +681,17 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-document.addEventListener("mousedown", boot);
+document.querySelector("#rom").addEventListener("change", onSelect);
+let running = false;
 
-function boot() {
-	run();
-	document.removeEventListener("mousedown", boot);
+function onSelect() {
+	console.log(this.value);
+	run(this.value);
+	document.querySelector("#rom").style.display = "none";
 }
 
-async function run() {
-	const rom = await fetch("/roms/PONG2");
+async function run(romName) {
+	const rom = await fetch("/roms/" + romName);
 	const arrayBuffer = await rom.arrayBuffer();
 	const romBuffer = new Uint8Array(arrayBuffer);
 	const chip8 = new _Chip8__WEBPACK_IMPORTED_MODULE_1__.Chip8(romBuffer);

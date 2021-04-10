@@ -4,10 +4,36 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Document</title>
+	<link rel="stylesheet" href="style.css">
 </head>
 <body>
 	<main>
 		<canvas></canvas>
+		<div>
+		<select id="rom">
+			<option value="test_opcode.ch8">Select Rom...</option>
+			<option value="15PUZZLE">15PUZZLE</option>
+			<option value="BLINKY">BLINKY</option>
+			<option value="BLITZ">BLITZ</option>
+			<option value="BRIX">BRIX</option>
+			<option value="CONNECT4">CONNECT4</option>
+			<option value="GUESS">GUESS</option>
+			<option value="HIDDEN">HIDDEN</option>
+			<option value="INVADERS">INVADERS</option>
+			<option value="KALEID">KALEID</option>
+			<option value="MAZE">MAZE</option>
+			<option value="MERLIN">MERLIN</option>
+			<option value="MISSILE">MISSILE</option>
+			<option value="PONG">PONG</option>
+			<option value="PONG2">PONG2</option>
+			<option value="PUZZLE">PUZZLE</option>
+			<option value="SYZGY">SYZGY</option>
+			<option value="TANK">TANK</option>
+			<option value="TETRIS">TETRIS</option>
+			<option value="TICTAC">TICTAC</option>
+			<option value="UFO">UFO</option>
+		</select>
+		</div>
 	</main>
 	<script src="./js/chip8bundle.js"></script>
 </body>
