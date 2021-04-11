@@ -5,7 +5,7 @@ import { Keyboard } from "./Keyboard";
 import { Memory } from "./Memory";
 import { CHARSET_ADDRESS, ENTRY_POINT } from "./memoryConstants";
 import { Registers } from "./Registers";
-import { CLOCK } from "./registersConstants";
+import { TIME_UNIT } from "./registersConstants";
 
 export class Chip8 {
 	constructor(romBuffer) {
@@ -27,7 +27,7 @@ export class Chip8 {
 		this.registers.PC = ENTRY_POINT;
 	}
 
-	sleep(ms = CLOCK) {
+	sleep(ms = TIME_UNIT) {
 		return new Promise(resolve => setTimeout(resolve, ms));
 	}
 
@@ -141,7 +141,7 @@ export class Chip8 {
 				break;
 			case "LD_VX_K":
 				while (!this.keyboard.anydown()) {
-					await this.sleep(CLOCK);
+					await this.sleep(TIME_UNIT);
 				}
 				V[args[0]] = this.keyboard.getPressedKey();
 				break;

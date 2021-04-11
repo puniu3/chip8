@@ -46,7 +46,7 @@ class Chip8 {
 		this.registers.PC = _memoryConstants__WEBPACK_IMPORTED_MODULE_5__.ENTRY_POINT;
 	}
 
-	sleep(ms = _registersConstants__WEBPACK_IMPORTED_MODULE_7__.CLOCK) {
+	sleep(ms = _registersConstants__WEBPACK_IMPORTED_MODULE_7__.TIME_UNIT) {
 		return new Promise(resolve => setTimeout(resolve, ms));
 	}
 
@@ -160,7 +160,7 @@ class Chip8 {
 				break;
 			case "LD_VX_K":
 				while (!this.keyboard.anydown()) {
-					await this.sleep(_registersConstants__WEBPACK_IMPORTED_MODULE_7__.CLOCK);
+					await this.sleep(_registersConstants__WEBPACK_IMPORTED_MODULE_7__.TIME_UNIT);
 				}
 				V[args[0]] = this.keyboard.getPressedKey();
 				break;
@@ -493,7 +493,6 @@ class Memory {
 	}
 
 	getOpcode(idx) {
-		console.assert((idx & 1) === 0, "opcode address must be even number");
 		const hb = this.getMemory(idx);
 		const lb = this.getMemory(idx + 1);
 		return (hb << 8) | lb;
@@ -676,28 +675,34 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+let loopId;
+let soundcard;
+
 document.querySelector("#rom").addEventListener("change", onSelect);
-let running = false;
 
 function onSelect() {
-	console.log(this.value);
+	soundcard = soundcard || (0,_SoundCard__WEBPACK_IMPORTED_MODULE_2__.makeSoundcard)();
 	run(this.value);
-	document.querySelector("#rom").style.display = "none";
+	this.blur();
 }
+
 
 async function run(romName) {
 	const rom = await fetch("/roms/" + romName);
 	const arrayBuffer = await rom.arrayBuffer();
 	const romBuffer = new Uint8Array(arrayBuffer);
 	const chip8 = new _Chip8__WEBPACK_IMPORTED_MODULE_0__.Chip8(romBuffer);
-	const soundcard = (0,_SoundCard__WEBPACK_IMPORTED_MODULE_2__.makeSoundcard)();
 
-	while (true) {
-		for (let i = 0; i < _registersConstants__WEBPACK_IMPORTED_MODULE_1__.CLOCKS_PER_TIME_UNIT; ++i) {
-			const op = chip8.memory.getOpcode(chip8.registers.PC);
-			chip8.execute(op);
-			chip8.display.draw();
-		}
+	clearInterval(loopId);
+	loopId = setInterval(loop, _registersConstants__WEBPACK_IMPORTED_MODULE_1__.TIME_UNIT);
+
+	function loop() {
+		// for (let i = 0; i < CLOCKS_PER_TIME_UNIT; ++i) {
+		const op = chip8.memory.getOpcode(chip8.registers.PC);
+		chip8.execute(op);
+		chip8.display.draw();
+		// }
+
 		if (chip8.registers.DT > 0) {
 			--chip8.registers.DT;
 		}
@@ -708,7 +713,6 @@ async function run(romName) {
 		} else {
 			soundcard.stop();
 		}
-		await chip8.sleep(_registersConstants__WEBPACK_IMPORTED_MODULE_1__.TIME_UNIT);
 	}
 }
 })();
