@@ -84,7 +84,7 @@ export class Chip8 {
 				break;
 			case "ADD_VX_VY":
 				V[0xf] =
-					(V[args[0]] + V[args[1]] > 0xff ? 1 : 0);
+					(0xff - V[args[0]] < V[args[1]] ? 1 : 0);
 				V[args[0]] += V[args[1]];
 				break;
 			case "SUB_VX_VY":
@@ -95,7 +95,7 @@ export class Chip8 {
 			case "SHR_VX_VY":
 				V[0xf] =
 					(V[args[0]] & 1 ? 1 : 0);
-				V[args[0]] >>= 1;
+				V[args[0]] >>>= 1;
 				break;
 			case "SUBN_VX_VY":
 				V[0xf] =
@@ -104,7 +104,7 @@ export class Chip8 {
 				break;
 			case "SHL_VX_VY":
 				V[0xf] =
-					(V[args[0]] & 0x8000 ? 1 : 0);
+					(V[args[0]] & 0x80 ? 1 : 0);
 				V[args[0]] <<= 1;
 				break;
 			case "SNE_VX_VY":
@@ -115,7 +115,7 @@ export class Chip8 {
 				this.registers.I = args[0];
 				break;
 			case "JP_V0_ADDR":
-				this.registers.SP = args[0] + V[0];
+				this.registers.PC = args[0] + V[0];
 				break;
 			case "RND_VX_KK":
 				V[args[0]] = (Math.random() * 0xff | 0) & args[1];
@@ -164,7 +164,7 @@ export class Chip8 {
 				this.memory.memory.set([h, t, o], this.registers.I);
 				break;
 			case "LD_I_VX":
-				this.memory.memory.set(V.slice(0, args[0]), this.registers.I);
+				this.memory.memory.set(V.slice(0, args[0] + 1), this.registers.I);
 				break;
 			case "LD_VX_I":
 				for (let i = 0; i <= args[0]; ++i) {

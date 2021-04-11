@@ -1,7 +1,4 @@
-import { CHARSET, CHAR_HEIGHT } from "./charSet";
 import { Chip8 } from "./Chip8";
-import { disassemble } from "./disassemble";
-import { Registers } from "./Registers";
 import { CLOCKS_PER_TIME_UNIT, TIME_UNIT } from "./registersConstants";
 import { makeSoundcard } from "./SoundCard";
 

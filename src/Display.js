@@ -28,8 +28,9 @@ export class Display {
 			for (let col = 0; col < SPRITE_WIDTH; ++col) {
 				const xx = (x + col) % DISPLAY_WIDTH;
 				const yy = (y + row) % DISPLAY_HEIGHT;
-				const pix = sprite[row] & 1 << 7 - col;
-				if (this.frameBuffer[yy][xx] & pix) collision = true;
+				const pix = (sprite[row] & (1 << (7 - col))) ? 1 : 0;
+				if (this.frameBuffer[yy][xx] && pix)
+					collision = true;
 				this.frameBuffer[yy][xx] ^= pix;
 			}
 		}

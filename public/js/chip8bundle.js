@@ -7,102 +7,9 @@
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "CHAR_HEIGHT": () => (/* binding */ CHAR_HEIGHT),
-/* harmony export */   "CHARSET": () => (/* binding */ CHARSET)
-/* harmony export */ });
-const CHAR_HEIGHT = 5;
-const CHARSET = [
-	0xF0,
-	0x90,
-	0x90,
-	0x90,
-	0xF0,
-	0x20,
-	0x60,
-	0x20,
-	0x20,
-	0x70,
-	0xF0,
-	0x10,
-	0xF0,
-	0x80,
-	0xF0,
-	0xF0,
-	0x10,
-	0xF0,
-	0x10,
-	0xF0,
-	0x90,
-	0x90,
-	0xF0,
-	0x10,
-	0x10,
-	0xF0,
-	0x80,
-	0xF0,
-	0x10,
-	0xF0,
-	0xF0,
-	0x80,
-	0xF0,
-	0x90,
-	0xF0,
-	0xF0,
-	0x10,
-	0x20,
-	0x40,
-	0x40,
-	0xF0,
-	0x90,
-	0xF0,
-	0x90,
-	0xF0,
-	0xF0,
-	0x90,
-	0xF0,
-	0x10,
-	0xF0,
-	0xF0,
-	0x90,
-	0xF0,
-	0x90,
-	0x90,
-	0xE0,
-	0x90,
-	0xE0,
-	0x90,
-	0xE0,
-	0xF0,
-	0x80,
-	0x80,
-	0x80,
-	0xF0,
-	0xE0,
-	0x90,
-	0x90,
-	0x90,
-	0xE0,
-	0xF0,
-	0x80,
-	0xF0,
-	0x80,
-	0xF0,
-	0xF0,
-	0x80,
-	0xF0,
-	0x80,
-	0x80,
-];
-
-/***/ }),
-/* 2 */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "Chip8": () => (/* binding */ Chip8)
 /* harmony export */ });
-/* harmony import */ var _charSet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
+/* harmony import */ var _charSet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
 /* harmony import */ var _disassemble__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
 /* harmony import */ var _Display__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4);
 /* harmony import */ var _Keyboard__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(6);
@@ -196,7 +103,7 @@ class Chip8 {
 				break;
 			case "ADD_VX_VY":
 				V[0xf] =
-					(V[args[0]] + V[args[1]] > 0xff ? 1 : 0);
+					(0xff - V[args[0]] < V[args[1]] ? 1 : 0);
 				V[args[0]] += V[args[1]];
 				break;
 			case "SUB_VX_VY":
@@ -207,7 +114,7 @@ class Chip8 {
 			case "SHR_VX_VY":
 				V[0xf] =
 					(V[args[0]] & 1 ? 1 : 0);
-				V[args[0]] >>= 1;
+				V[args[0]] >>>= 1;
 				break;
 			case "SUBN_VX_VY":
 				V[0xf] =
@@ -216,7 +123,7 @@ class Chip8 {
 				break;
 			case "SHL_VX_VY":
 				V[0xf] =
-					(V[args[0]] & 0x8000 ? 1 : 0);
+					(V[args[0]] & 0x80 ? 1 : 0);
 				V[args[0]] <<= 1;
 				break;
 			case "SNE_VX_VY":
@@ -227,7 +134,7 @@ class Chip8 {
 				this.registers.I = args[0];
 				break;
 			case "JP_V0_ADDR":
-				this.registers.SP = args[0] + V[0];
+				this.registers.PC = args[0] + V[0];
 				break;
 			case "RND_VX_KK":
 				V[args[0]] = (Math.random() * 0xff | 0) & args[1];
@@ -276,7 +183,7 @@ class Chip8 {
 				this.memory.memory.set([h, t, o], this.registers.I);
 				break;
 			case "LD_I_VX":
-				this.memory.memory.set(V.slice(0, args[0]), this.registers.I);
+				this.memory.memory.set(V.slice(0, args[0] + 1), this.registers.I);
 				break;
 			case "LD_VX_I":
 				for (let i = 0; i <= args[0]; ++i) {
@@ -288,6 +195,99 @@ class Chip8 {
 		}
 	}
 }
+
+/***/ }),
+/* 2 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "CHAR_HEIGHT": () => (/* binding */ CHAR_HEIGHT),
+/* harmony export */   "CHARSET": () => (/* binding */ CHARSET)
+/* harmony export */ });
+const CHAR_HEIGHT = 5;
+const CHARSET = [
+	0xF0,
+	0x90,
+	0x90,
+	0x90,
+	0xF0,
+	0x20,
+	0x60,
+	0x20,
+	0x20,
+	0x70,
+	0xF0,
+	0x10,
+	0xF0,
+	0x80,
+	0xF0,
+	0xF0,
+	0x10,
+	0xF0,
+	0x10,
+	0xF0,
+	0x90,
+	0x90,
+	0xF0,
+	0x10,
+	0x10,
+	0xF0,
+	0x80,
+	0xF0,
+	0x10,
+	0xF0,
+	0xF0,
+	0x80,
+	0xF0,
+	0x90,
+	0xF0,
+	0xF0,
+	0x10,
+	0x20,
+	0x40,
+	0x40,
+	0xF0,
+	0x90,
+	0xF0,
+	0x90,
+	0xF0,
+	0xF0,
+	0x90,
+	0xF0,
+	0x10,
+	0xF0,
+	0xF0,
+	0x90,
+	0xF0,
+	0x90,
+	0x90,
+	0xE0,
+	0x90,
+	0xE0,
+	0x90,
+	0xE0,
+	0xF0,
+	0x80,
+	0x80,
+	0x80,
+	0xF0,
+	0xE0,
+	0x90,
+	0x90,
+	0x90,
+	0xE0,
+	0xF0,
+	0x80,
+	0xF0,
+	0x80,
+	0xF0,
+	0xF0,
+	0x80,
+	0xF0,
+	0x80,
+	0x80,
+];
 
 /***/ }),
 /* 3 */
@@ -399,8 +399,9 @@ class Display {
 			for (let col = 0; col < _displayConstants__WEBPACK_IMPORTED_MODULE_0__.SPRITE_WIDTH; ++col) {
 				const xx = (x + col) % _displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_WIDTH;
 				const yy = (y + row) % _displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_HEIGHT;
-				const pix = sprite[row] & 1 << 7 - col;
-				if (this.frameBuffer[yy][xx] & pix) collision = true;
+				const pix = (sprite[row] & (1 << (7 - col))) ? 1 : 0;
+				if (this.frameBuffer[yy][xx] && pix)
+					collision = true;
 				this.frameBuffer[yy][xx] ^= pix;
 			}
 		}
@@ -471,7 +472,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "Memory": () => (/* binding */ Memory)
 /* harmony export */ });
-/* harmony import */ var _charSet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
+/* harmony import */ var _charSet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
 /* harmony import */ var _memoryConstants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(8);
 
 
@@ -567,7 +568,7 @@ __webpack_require__.r(__webpack_exports__);
 const NUM_REGISTERS = 16;
 const STACK_DEPTH = 16;
 const TIME_UNIT = 1000 / 60;
-const CLOCKS_PER_TIME_UNIT = 8;
+const CLOCKS_PER_TIME_UNIT = 9;
 
 /***/ }),
 /* 11 */
@@ -668,15 +669,9 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _charSet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
-/* harmony import */ var _Chip8__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);
-/* harmony import */ var _disassemble__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(3);
-/* harmony import */ var _Registers__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(9);
-/* harmony import */ var _registersConstants__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(10);
-/* harmony import */ var _SoundCard__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(11);
-
-
-
+/* harmony import */ var _Chip8__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
+/* harmony import */ var _registersConstants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(10);
+/* harmony import */ var _SoundCard__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(11);
 
 
 
@@ -694,11 +689,11 @@ async function run(romName) {
 	const rom = await fetch("/roms/" + romName);
 	const arrayBuffer = await rom.arrayBuffer();
 	const romBuffer = new Uint8Array(arrayBuffer);
-	const chip8 = new _Chip8__WEBPACK_IMPORTED_MODULE_1__.Chip8(romBuffer);
-	const soundcard = (0,_SoundCard__WEBPACK_IMPORTED_MODULE_5__.makeSoundcard)();
+	const chip8 = new _Chip8__WEBPACK_IMPORTED_MODULE_0__.Chip8(romBuffer);
+	const soundcard = (0,_SoundCard__WEBPACK_IMPORTED_MODULE_2__.makeSoundcard)();
 
 	while (true) {
-		for (let i = 0; i < _registersConstants__WEBPACK_IMPORTED_MODULE_4__.CLOCKS_PER_TIME_UNIT; ++i) {
+		for (let i = 0; i < _registersConstants__WEBPACK_IMPORTED_MODULE_1__.CLOCKS_PER_TIME_UNIT; ++i) {
 			const op = chip8.memory.getOpcode(chip8.registers.PC);
 			chip8.execute(op);
 			chip8.display.draw();
@@ -713,7 +708,7 @@ async function run(romName) {
 		} else {
 			soundcard.stop();
 		}
-		await chip8.sleep(_registersConstants__WEBPACK_IMPORTED_MODULE_4__.TIME_UNIT);
+		await chip8.sleep(_registersConstants__WEBPACK_IMPORTED_MODULE_1__.TIME_UNIT);
 	}
 }
 })();
