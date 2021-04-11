@@ -6,13 +6,13 @@ let loopId;
 let soundcard;
 
 document.querySelector("#rom").addEventListener("change", onSelect);
+window.addEventListener("load", () => run("test_opcode.ch8"));
 
 function onSelect() {
 	soundcard = soundcard || makeSoundcard();
 	run(this.value);
 	this.blur();
 }
-
 
 async function run(romName) {
 	const rom = await fetch("/roms/" + romName);
@@ -37,9 +37,9 @@ async function run(romName) {
 
 		if (chip8.registers.ST > 0) {
 			--chip8.registers.ST;
-			soundcard.start();
+			soundcard && soundcard.start();
 		} else {
-			soundcard.stop();
+			soundcard && soundcard.stop();
 		}
 	}
 }
