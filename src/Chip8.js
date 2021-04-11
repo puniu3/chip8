@@ -5,7 +5,6 @@ import { Keyboard } from "./Keyboard";
 import { Memory } from "./Memory";
 import { CHARSET_ADDRESS, ENTRY_POINT } from "./memoryConstants";
 import { Registers } from "./Registers";
-import { TIME_UNIT } from "./registersConstants";
 
 export class Chip8 {
 	constructor(romBuffer) {
@@ -25,10 +24,6 @@ export class Chip8 {
 		console.assert(romBuffer.length + ENTRY_POINT <= 0x0fff, "rom too large to fit in memory");
 		this.memory.memory.set(romBuffer, ENTRY_POINT);
 		this.registers.PC = ENTRY_POINT;
-	}
-
-	sleep(ms = TIME_UNIT) {
-		return new Promise(resolve => setTimeout(resolve, ms));
 	}
 
 	async execute(opcode) {
@@ -118,7 +113,7 @@ export class Chip8 {
 				this.registers.PC = args[0] + V[0];
 				break;
 			case "RND_VX_KK":
-				V[args[0]] = (Math.random() * 0xff | 0) & args[1];
+				V[args[0]] = Math.floor(Math.random() * 0xff) & args[1];
 				break;
 			case "DRW_VX_VY_N":
 				const I = this.registers.I;
@@ -140,10 +135,10 @@ export class Chip8 {
 				V[args[0]] = this.registers.DT;
 				break;
 			case "LD_VX_K":
-				while (!this.keyboard.anydown()) {
-					await this.sleep(TIME_UNIT);
-				}
-				V[args[0]] = this.keyboard.getPressedKey();
+				if (!this.keyboard.anydown())
+					this.registers.PC -= 2;
+				else
+					V[args[0]] = this.keyboard.getPressedKey();
 				break;
 			case "LD_DT_VX":
 				this.registers.DT = V[args[0]];

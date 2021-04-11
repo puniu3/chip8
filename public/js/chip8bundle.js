@@ -16,8 +16,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Memory__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(7);
 /* harmony import */ var _memoryConstants__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(8);
 /* harmony import */ var _Registers__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(9);
-/* harmony import */ var _registersConstants__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(10);
-
 
 
 
@@ -44,10 +42,6 @@ class Chip8 {
 		console.assert(romBuffer.length + _memoryConstants__WEBPACK_IMPORTED_MODULE_5__.ENTRY_POINT <= 0x0fff, "rom too large to fit in memory");
 		this.memory.memory.set(romBuffer, _memoryConstants__WEBPACK_IMPORTED_MODULE_5__.ENTRY_POINT);
 		this.registers.PC = _memoryConstants__WEBPACK_IMPORTED_MODULE_5__.ENTRY_POINT;
-	}
-
-	sleep(ms = _registersConstants__WEBPACK_IMPORTED_MODULE_7__.TIME_UNIT) {
-		return new Promise(resolve => setTimeout(resolve, ms));
 	}
 
 	async execute(opcode) {
@@ -137,7 +131,7 @@ class Chip8 {
 				this.registers.PC = args[0] + V[0];
 				break;
 			case "RND_VX_KK":
-				V[args[0]] = (Math.random() * 0xff | 0) & args[1];
+				V[args[0]] = Math.floor(Math.random() * 0xff) & args[1];
 				break;
 			case "DRW_VX_VY_N":
 				const I = this.registers.I;
@@ -159,10 +153,10 @@ class Chip8 {
 				V[args[0]] = this.registers.DT;
 				break;
 			case "LD_VX_K":
-				while (!this.keyboard.anydown()) {
-					await this.sleep(_registersConstants__WEBPACK_IMPORTED_MODULE_7__.TIME_UNIT);
-				}
-				V[args[0]] = this.keyboard.getPressedKey();
+				if (!this.keyboard.anydown())
+					this.registers.PC -= 2;
+				else
+					V[args[0]] = this.keyboard.getPressedKey();
 				break;
 			case "LD_DT_VX":
 				this.registers.DT = V[args[0]];
@@ -397,6 +391,8 @@ class Display {
 		let collision = false;
 		for (let row = 0; row < sprite.length; ++row) {
 			for (let col = 0; col < _displayConstants__WEBPACK_IMPORTED_MODULE_0__.SPRITE_WIDTH; ++col) {
+				if (this.blitz && row + y >= _displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_HEIGHT)
+					return;
 				const xx = (x + col) % _displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_WIDTH;
 				const yy = (y + row) % _displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_HEIGHT;
 				const pix = (sprite[row] & (1 << (7 - col))) ? 1 : 0;
@@ -484,12 +480,13 @@ class Memory {
 	}
 
 	setMemory(idx, val) {
-		if (idx < _memoryConstants__WEBPACK_IMPORTED_MODULE_1__.MEMORY_SIZE)
-			this.memory[idx] = val;
+		console.assert(idx < _memoryConstants__WEBPACK_IMPORTED_MODULE_1__.MEMORY_SIZE, "setMemory: RAM out of index");
+		this.memory[idx] = val;
 	}
 
 	getMemory(idx) {
-		if (idx < _memoryConstants__WEBPACK_IMPORTED_MODULE_1__.MEMORY_SIZE) return this.memory[idx];
+		console.assert(idx < _memoryConstants__WEBPACK_IMPORTED_MODULE_1__.MEMORY_SIZE, "getMemory: RAM out of index");
+		return this.memory[idx];
 	}
 
 	getOpcode(idx) {
@@ -692,16 +689,17 @@ async function run(romName) {
 	const arrayBuffer = await rom.arrayBuffer();
 	const romBuffer = new Uint8Array(arrayBuffer);
 	const chip8 = new _Chip8__WEBPACK_IMPORTED_MODULE_0__.Chip8(romBuffer);
+	chip8.display.blitz = (romName === "BLITZ");
 
 	clearInterval(loopId);
 	loopId = setInterval(loop, _registersConstants__WEBPACK_IMPORTED_MODULE_1__.TIME_UNIT);
 
 	function loop() {
-		// for (let i = 0; i < CLOCKS_PER_TIME_UNIT; ++i) {
-		const op = chip8.memory.getOpcode(chip8.registers.PC);
-		chip8.execute(op);
-		chip8.display.draw();
-		// }
+		for (let i = 0; i < _registersConstants__WEBPACK_IMPORTED_MODULE_1__.CLOCKS_PER_TIME_UNIT; ++i) {
+			const op = chip8.memory.getOpcode(chip8.registers.PC);
+			chip8.execute(op);
+			chip8.display.draw();
+		}
 
 		if (chip8.registers.DT > 0) {
 			--chip8.registers.DT;

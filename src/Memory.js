@@ -8,12 +8,13 @@ export class Memory {
 	}
 
 	setMemory(idx, val) {
-		if (idx < MEMORY_SIZE)
-			this.memory[idx] = val;
+		console.assert(idx < MEMORY_SIZE, "setMemory: RAM out of index");
+		this.memory[idx] = val;
 	}
 
 	getMemory(idx) {
-		if (idx < MEMORY_SIZE) return this.memory[idx];
+		console.assert(idx < MEMORY_SIZE, "getMemory: RAM out of index");
+		return this.memory[idx];
 	}
 
 	getOpcode(idx) {

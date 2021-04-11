@@ -26,6 +26,8 @@ export class Display {
 		let collision = false;
 		for (let row = 0; row < sprite.length; ++row) {
 			for (let col = 0; col < SPRITE_WIDTH; ++col) {
+				if (this.blitz && row + y >= DISPLAY_HEIGHT)
+					return;
 				const xx = (x + col) % DISPLAY_WIDTH;
 				const yy = (y + row) % DISPLAY_HEIGHT;
 				const pix = (sprite[row] & (1 << (7 - col))) ? 1 : 0;
